@@ -1,18 +1,40 @@
 from pymongo import MongoClient
-from .pymongo_get_database import Mongo_DB
-from .mySql import MySQL_class
+from pymongo_get_database import Mongo_DB
+from mySql import MySQL_class
+import os
+from dotenv import load_dotenv
+import mysql.connector
 
-
-connection_str="mongodb+srv://py-trainee:jMaDl9Lyn03r2zT3@trainee-cluster.ojubn5t.mongodb.net/?retryWrites=true&w=majority&appName=trainee-cluster"
+#for mongodb connection--------
+load_dotenv()
+connection_str=os.getenv("Mongo_connection_url")
 obj=Mongo_DB(connection_str)
-obj.connection_check()
+check=obj.connection_check()
+collections=obj.list_collection()
+print(collections)#prints out all the mongo collection contents
 
-# my_db=client.sample_analytics
-#         collection1=my_db.accounts
-#         # collec2=my_db.customers
-#         # collec3=my_db.transactions
-#         cursor=collection1.find()
-#         print(cursor)
-#         for each_col in cursor:
-#             print(each_col["products"])
+
+#for MySql connections---------
+obj=MySQL_class(host="127.0.0.1", port="3306",user="anjala",password="anjala@xampp")
+print(obj.point_connection()) #returns true if connected
+obj.make_schema()
+
+#the migration logic------
+def migrate_dataset():
+    #here refine the data and insert into mysql db logicc
+    source_database=collections
+    # destination_database=
+
+
+
+
+    return
+
+
+migrate=migrate_dataset()
+
+
+
+
+
 

@@ -6,7 +6,8 @@ class MySQL_class:
             host=host,
             port=port,
             user=user,
-            password=password   
+            password=password, 
+            database="sample_analytics"
         )
         
     def point_connection(self):
@@ -15,10 +16,12 @@ class MySQL_class:
             return True
         return False
     
-        
 
-obj=MySQL_class(host="127.0.0.1", port="3306",user="root",password="")
-print(obj.point_connection())
+    def make_schema(self):
+        self.mycursor.execute("CREATE TABLE accounts")
+        self.mycursor.execute("CREATE TABLE customers")
+        self.mycursor.execute("CREATE TABLE transactions")
 
-obj.mycursor.execute("DROP SCHEMA IF EXISTS new;")
+        return 
+# obj.mycursor.execute("DROP SCHEMA IF EXISTS new;")
     

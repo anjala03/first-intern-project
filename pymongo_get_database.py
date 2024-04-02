@@ -17,14 +17,29 @@ class Mongo_DB:
             #the database can be acesssed via, client.databasename as below
             self.my_db=self.client.sample_analytics
             self.collections=self.my_db.list_collection_names()
-            return self.collections # ['transactions', 'customers', 'accounts']
+            print(self.collections)
+            print("--------------")
+            def show_documents(collection_name):
+                my_collection= self.my_db[collection_name]
+                documents=[]
+                for docs in my_collection.find({}):
+                    print(docs)
+                    print()
+                    documents.append(docs)
+                return documents
+            collection_docs=[]
+            for i in self.collections:
+                collection_docs.append(show_documents(i))
+            return collection_docs
 
-    def for_each_collection(self):
-            collection1=self.collections[0]
-            collection2=self.collections[1]
-            collection3=self.collections[2]   
-            return collection1
+
+        
             
+            
+           
+            
+          
+ 
         
     
         
@@ -33,15 +48,8 @@ class Mongo_DB:
 
 
 
-    
 
-connection_str="mongodb+srv://py-trainee:jMaDl9Lyn03r2zT3@trainee-cluster.ojubn5t.mongodb.net/?retryWrites=true&w=majority&appName=trainee-cluster"
-obj=Mongo_DB(connection_str)
-obj.connection_check()
-obj.list_collection_content()
 
-a=obj.list_collection_content()
-print(a)
 
 
 
