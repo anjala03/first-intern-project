@@ -10,21 +10,25 @@ class Mongo_DB:
         if self.client:
             return {"message":"Connected to mongo_db"}
         return {"message":"Not Connected to mongo_db"}
-    
+
+
     def list_collection(self):
         if self.client!=None:
             my_dbs=self.client.list_database_names()
             #the database can be acesssed via, client.databasename as below
             self.my_db=self.client.sample_analytics
             self.collections=self.my_db.list_collection_names()
-            print(self.collections)
-            print("--------------")
+            return self.collections
+    
+    
+    def collection_docs(self):
+        
+        if self.client!=None:
+            self.my_db=self.client.sample_analytics
             def show_documents(collection_name):
                 my_collection= self.my_db[collection_name]
                 documents=[]
                 for docs in my_collection.find({}):
-                    print(docs)
-                    print()
                     documents.append(docs)
                 return documents
             collection_docs=[]

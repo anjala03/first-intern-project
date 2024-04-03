@@ -1,12 +1,11 @@
 import mysql.connector
 
 class MySQL_class:
-    def __init__(self, host, port, user, password):
+    def __init__(self, host, port, user):
         self.my_db=mysql.connector.connect(
             host=host,
             port=port,
-            user=user,
-            password=password, 
+            user=user, 
             database="sample_analytics"
         )
         
@@ -15,13 +14,17 @@ class MySQL_class:
             self.mycursor = mycursor
             return True
         return False
+
     
 
-    def make_schema(self):
-        self.mycursor.execute("CREATE TABLE accounts")
-        self.mycursor.execute("CREATE TABLE customers")
-        self.mycursor.execute("CREATE TABLE transactions")
+    def close_connection(self):
+        if self.mycursor.close():
+            print("cursor closeddd")
+            if self.my_db.close():
+                print("db closed")
+                return True
+            return False
 
-        return 
+
 # obj.mycursor.execute("DROP SCHEMA IF EXISTS new;")
     
