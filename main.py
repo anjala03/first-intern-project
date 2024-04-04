@@ -13,41 +13,65 @@ check=obj.connection_check()
 
 #function call related to mongodb ---
 collections=obj.list_collection()
-print(collections)
-print()
+# print("-----LIST OF COLLECTION FROM MONGODB-----")
+# print(collections)
+# print()
 
 collection_docs=obj.collection_docs()
-print(collection_docs)#prints out all the mongo collection contents
+# print("--------LIST OF COLLECTION_CONTENTS FROM MONGODB-------")
+# print(collection_docs)
 
 #for MySql connections---------
 obj=MySQL_class(host="127.0.0.1", port="3306",user="anjala_bhatta")
+print("------- MYSQL DB CONNECTION CHECK-------")
 print(obj.point_connection()) #returns true if connected
 
 
+
 # #the migration logic------
-def mysql_schema_creation():
-    for tables in collection_docs:
-        for attributes in tables:
-            print(attributes)
-            print()
-            dict_keys=attributes.keys()
-            print(dict_keys)
-            keys_list=(list(dict_keys)) 
-            # for each in keys_list:
-               
+# function_return=[]
+def mysql_fill_value():
+    tables=[]
+    def table_names():#gives the table name
+        for each_collect in collections:
+            tables.append(each_collect)
+        return tables
+    
+    table_list=table_names()# returns the list of tables
+    for each_table in table_list:
+        print(each_table)
+        for tables in collection_docs:
+            for dictionaries in tables:
+                dict_keys=dictionaries.keys()
+                print(dict_keys) #gives the keys-->column name
+                values=dictionaries.values() #gives row --> row values
+                print(values)
+                for ek in dict_keys:
+                    if ek.startswith('_id'):
+                        primary_key=ek #gives the primary key of each table
+                        print(f"pk for {list(dict_keys)} is {primary_key}")
+                   
 
-            # keys_list=(list(dict_keys)) 
-            # print()
-            # print(keys_list)
-    return {"message":"done till here"}
+                        
 
 
-    # for each_table in collections:
-    #     query_str=f"CREATE TABLE {each_table}(f)"
-    #     obj.mycursor.execute(query_str)
-    #     obj.my_db.commit()
-    # return {"message":"tables created"}
-print(mysql_schema_creation())
+                    
+            
+
+
+         
+        
+        return {"message":"done till here"}
+        
+# def the
+            
+
+          
+
+
+
+    
+print(mysql_fill_value())
 print(obj.close_connection())
 
 

@@ -14,8 +14,7 @@ class MySQL_class:
             self.mycursor = mycursor
             return True
         return False
-
-    
+   
 
     def close_connection(self):
         if self.mycursor.close():
@@ -24,6 +23,9 @@ class MySQL_class:
                 print("db closed")
                 return True
             return False
+
+
+    
 
 
 # obj.mycursor.execute("DROP SCHEMA IF EXISTS new;")
