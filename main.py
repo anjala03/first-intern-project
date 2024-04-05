@@ -27,51 +27,45 @@ print("------- MYSQL DB CONNECTION CHECK-------")
 print(obj.point_connection()) #returns true if connected
 
 
-
-# #the migration logic------
-# function_return=[]
-def mysql_fill_value():
-    tables=[]
-    def table_names():#gives the table name
-        for each_collect in collections:
-            tables.append(each_collect)
-        return tables
+table__name_lists=[] #gives the lists of table names
+def table_names():
+    for each_collection in collections:
+        table__name_lists.append(each_collection)
+        print(table__name_lists) 
     
-    table_list=table_names()# returns the list of tables
-    for each_table in table_list:
-        print(each_table)
-        for tables in collection_docs:
-            for dictionaries in tables:
-                dict_keys=dictionaries.keys()
-                print(dict_keys) #gives the keys-->column name
-                values=dictionaries.values() #gives row --> row values
-                print(values)
-                for ek in dict_keys:
-                    if ek.startswith('_id'):
-                        primary_key=ek #gives the primary key of each table
-                        print(f"pk for {list(dict_keys)} is {primary_key}")
-                   
+    if isinstance([i for i in table_fill_values()[0]], (list, dict)):
+        print("hiiiii")
+        # print(table_name)
+        # table__name_lists.append(table_name)      
+    return table__name_lists   
 
-                        
+return_values=[]
+def table_fill_values():
+    for documents in collection_docs:
+        for records in documents:
+            table_fields=records.keys()
+            # print(table_fields) #gives the keys-->column name
+            table_row=records.values() #gives row --> row values
+            # print(table_records)
+            for field_name in table_fields:
+                if field_name.startswith('_id'):
+                    primary_key=field_name #gives the primary key of each table
+                    # print(f"pk for {list(table_fields)} is {primary_key}")
+            return_values.append([records, table_fields,table_row, primary_key])             
+    return (return_values)
+
+# def for_foreign_key():
+#     table_names()
+
+    
 
 
-                    
-            
-
-
-         
-        
-        return {"message":"done till here"}
-        
-# def the
-            
-
-          
 
 
 
     
-print(mysql_fill_value())
+print(table_names())
+# print(table_fill_values())
 print(obj.close_connection())
 
 
