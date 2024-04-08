@@ -23,49 +23,70 @@ collection_docs=obj.collection_docs()
 
 #for MySql connections---------
 obj=MySQL_class(host="127.0.0.1", port="3306",user="anjala_bhatta")
-print("------- MYSQL DB CONNECTION CHECK-------")
-print(obj.point_connection()) #returns true if connected
+# print("------- MYSQL DB CONNECTION CHECK-------")
+obj.point_connection() #returns true if connected
 
 
-table__name_lists=[] #gives the lists of table names
-def table_names():
+def table_names():    
+    table__name_lists=[]#gives the lists of table names
     for each_collection in collections:
         table__name_lists.append(each_collection)
-        print(table__name_lists) 
-    
-    if isinstance([i for i in table_fill_values()[0]], (list, dict)):
-        print("hiiiii")
-        # print(table_name)
-        # table__name_lists.append(table_name)      
+    table = table_fill_values()
+    for each_list in table:
+        for key,value in each_list[1].items():
+            if isinstance(value,(list, dict)):   
+                splitted_table_name=[]
+                if type(value)==list and type(value[0])==dict:
+                    splitted_table_name.append(key)
+                    table_field=value[0].keys()
+                    table_values=value[0].values()
+                    print(table_field)
+                if type(value)==dict:
+                    table_field=[for key, value in value.values()]
+                    print(table_field)
+
+
+                    splitted_table_name.append(key)
+                table__name_lists.extend(splitted_table_name)
     return table__name_lists   
 
-return_values=[]
+
 def table_fill_values():
+    all_table_values=[]
     for documents in collection_docs:
         for records in documents:
             table_fields=records.keys()
-            # print(table_fields) #gives the keys-->column name
             table_row=records.values() #gives row --> row values
-            # print(table_records)
             for field_name in table_fields:
                 if field_name.startswith('_id'):
                     primary_key=field_name #gives the primary key of each table
-                    # print(f"pk for {list(table_fields)} is {primary_key}")
-            return_values.append([records, table_fields,table_row, primary_key])             
-    return (return_values)
+            all_table_values.append([primary_key, records, table_fields, table_row])      
+    return all_table_values
 
-# def for_foreign_key():
-#     table_names()
 
+# def for_splitted_table():
+    
+#     # tables=[i for i in table_names()]
+#     # if tables[3:]:
+        
+#     #     fields=
+#     #     rows=
     
 
 
 
 
 
+
+
     
+
+
+
+
 print(table_names())
-# print(table_fill_values())
+# table_fill_values()
+# print(for_splitted_table())
 print(obj.close_connection())
 
 
