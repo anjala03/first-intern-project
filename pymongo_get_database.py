@@ -22,7 +22,6 @@ class Mongo_DB:
     
     
     def collection_docs(self):
-        
         if self.client!=None:
             self.my_db=self.client.sample_analytics
             def show_documents(collection_name):

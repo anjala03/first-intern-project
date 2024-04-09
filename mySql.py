@@ -10,7 +10,7 @@ class MySQL_class:
         )
         
     def point_connection(self):
-        if (mycursor := self.my_db.cursor()):
+        if (mycursor := self.my_db.cursor(buffered=True)):
             self.mycursor = mycursor
             return True
         return False
@@ -23,7 +23,7 @@ class MySQL_class:
                 print("db closed")
                 return True
             return False
-
+        return({"message": "cursor not closed"})
 
     
 
