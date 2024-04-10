@@ -1,29 +1,30 @@
 import mysql.connector
 
-class MySQL_class:
+class MySQLclass:
     def __init__(self, host, port, user):
         self.my_db=mysql.connector.connect(
-            host=host,
-            port=port,
-            user=user, 
-            database="sample_analytics"
+            host = host,
+            port = port,
+            user = user, 
+            database = "sample_analytics"
         )
         
     def point_connection(self):
-        if (mycursor := self.my_db.cursor(buffered=True)):
+        if (mycursor := self.my_db.cursor(buffered = True)):
             self.mycursor = mycursor
             return True
         return False
    
 
     def close_connection(self):
-        if self.mycursor.close():
-            print("cursor closeddd")
-            if self.my_db.close():
-                print("db closed")
-                return True
-            return False
-        return({"message": "cursor not closed"})
+        if self.mycursor:
+            self.mycursor.close()
+        if self.my_db:
+            self.my_db.close()
+            return {"db_close": True}
+        else:
+            return {"db_close": False}
+        
 
     
 
