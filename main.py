@@ -2,6 +2,8 @@ from pymongo_get_database import MongoDB
 import os
 from dotenv import load_dotenv
 from mySql import MySQLclass
+import datetime
+import json
 
 
 #for mongodb connection--------
@@ -31,10 +33,9 @@ def all_table_name():
         for key,value in each_list[1].items():
             splitted_table_name = []
             if isinstance(value,(list, dict)):
-                if type(value) == list and (type(value[0]) == dict or type(value[0]) == list):
-                    splitted_table_name.append(key)
-
-                elif type(value) == dict:
+                if key in table_name_lists:
+                    key=key + "_"+ "extended_table"
+                if (type(value) == list and (type(value[0]) == dict or type(value[0]) == list)) or (type(value) == dict):
                     splitted_table_name.append(key)
                 table_name_lists.extend(splitted_table_name)
     return table_name_lists #returns a list of table names all
@@ -83,23 +84,27 @@ def table_fill_values():
 obj = MySQLclass(host="127.0.0.1", port="3306", user="anjala_bhatta")
 print(f'sql connection {obj.point_connection()}')
 
-def params_for_sql_query():
-    values = table_fill_values()
-    val = {}
-    for attribute in values:
-        val["transaction"] = attribute[2]
-        print(val)
-    
+def params_for_sql_query():  
     bson = {}
-    table = all_table_name()[:3]
-    for each_table in table:
+    table_list = all_table_name()
+    print(table_list)
+    for each_table in table_list:
+        table_index = table_list.index(each_table)
         bson[each_table] = {}
-        bson[each_table] = {val[]:None}
-           
-        
-
+        table_tuple_set = table_fill_values() 
+        for each_tuple in table_tuple_set:
+            tuple_index = table_tuple_set.index(each_tuple)
+            if table_index == tuple_index:
+                key_val_record=each_tuple[1]
+                column_name_list = each_tuple[2]
+                for each_column in column_name_list:
+                    if (each_column.startswith(each_table)) or (type(value) == list and (type(value[0]) == dict or type(value[0]) == list)):
+                        continue     
+                    bson[each_table][each_column] = "None"
     return bson
-print(params_for_sql_query())
+
+sql_schema_json = params_for_sql_query()
+print(json.dumps(sql_schema_json))
 
  
 
