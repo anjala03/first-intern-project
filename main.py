@@ -96,9 +96,10 @@ def params_for_sql_query():
             tuple_index = table_tuple_set.index(each_tuple)
             if table_index == tuple_index:
                 key_val_record=each_tuple[1]
+                # print(f"+++++++++++{key_val_record}")
                 column_name_list = each_tuple[2]
                 for each_column in column_name_list:
-                    if (each_column.startswith(each_table)) or (type(value) == list and (type(value[0]) == dict or type(value[0]) == list)):
+                    if (each_column.startswith(each_table)) or type(key_val_record.keys()) == list and (type((key_val_record.keys()[0]) == dict or type((key_val_record.keys()[0]) == list))):
                         continue     
                     bson[each_table][each_column] = "None"
     return bson
