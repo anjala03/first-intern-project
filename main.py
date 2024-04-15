@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from mySql import MySQLclass
 import datetime
 import json
+import difflib
 
 
 #for mongodb connection--------
@@ -35,6 +36,7 @@ def all_table_name():
             if isinstance(value,(list, dict)):
                 if key in table_name_lists:
                     key=key + "_"+ "extended_table"
+                    #string concatenation 
                 if (type(value) == list and (type(value[0]) == dict or type(value[0]) == list)) or (type(value) == dict):
                     splitted_table_name.append(key)
                 table_name_lists.extend(splitted_table_name)
@@ -87,21 +89,32 @@ print(f'sql connection {obj.point_connection()}')
 def params_for_sql_query():  
     bson = {}
     table_list = all_table_name()
-    print(table_list)
+    extended_table_attributes = extended_table_values()
     for each_table in table_list:
         table_index = table_list.index(each_table)
         bson[each_table] = {}
         table_tuple_set = table_fill_values() 
-        for each_tuple in table_tuple_set:
-            tuple_index = table_tuple_set.index(each_tuple)
-            if table_index == tuple_index:
-                key_val_record=each_tuple[1]
-                # print(f"+++++++++++{key_val_record}")
-                column_name_list = each_tuple[2]
+        for index, table_value in enumerate(table_tuple_set):
+            if table_index == index:
+                key_val_record  = table_value[1]
+                column_name_list = table_value[2]
                 for each_column in column_name_list:
-                    if (each_column.startswith(each_table)) or type(key_val_record.keys()) == list and (type((key_val_record.keys()[0]) == dict or type((key_val_record.keys()[0]) == list))):
+                    value = key_val_record.get(each_column)
+                    if (each_column.startswith(each_table) or (isinstance(value, (list, dict)))):
                         continue     
                     bson[each_table][each_column] = "None"
+
+        if bson.get(each_table) == {}:
+            for each_extended_table in extended_table_attributes:
+                column_list = each_extended_table[0]
+                print("hiiii")
+                print(column_list)
+                print(f' table name is {each_table}')
+                similar_search=difflib.get_close_matches(each_table, column_list)
+                print(similar_search)
+                if similar_search:
+                    for each_column in column_list:
+                        bson[each_table][each_column] = "None"
     return bson
 
 sql_schema_json = params_for_sql_query()
