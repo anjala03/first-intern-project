@@ -123,10 +123,14 @@ sql_schema_json = params_for_sql_query()
 
 def column_type(column_name):
     print(column_name)
-    if (("_id" or "id" or "limit") in column_name) or column_name.endswith('_id' or 'id'):
+    if ("_id" in column_name or "id" in column_name or "limit" in column_name or "_count" in column_name):
         return "INT"
-    elif ("price" or  "total" or "amount") in column_name:
+    elif "price"in column_name or "total" in column_name or "amount" in column_name:
         return "FLOAT"
+    elif "active" in column_name:
+        return "BOOL"
+    else:
+        return "VARCHAR[100]"
 
 
 #function call for the data type determination
