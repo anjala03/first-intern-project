@@ -115,35 +115,53 @@ def params_for_sql_query():
     return bson
 
 sql_schema_json = params_for_sql_query()
-print(json.dumps(sql_schema_json))
+# print(json.dumps(sql_schema_json))
 
  
 
+#--- for mysql schema----------------------------------------------------------------------------------------------
+
+def column_type(column_name):
+    print(column_name)
+    if (("_id" or "id" or "limit") in column_name) or column_name.endswith('_id' or 'id'):
+        return "INT"
+    elif ("price" or  "total" or "amount") in column_name:
+        return "FLOAT"
+
+
+#function call for the data type determination
+json=params_for_sql_query()
+for table_name, column_dictionary in json.items():
+    column_names=column_dictionary.keys()
+    for each_column in column_names:
+        print(column_type(each_column)) #function calledover here 
 
 
 
-# def create_schema(table_names):
-#     for table_name in table_names:
-#         # table_values=table_fill_values()
-#         # for i in table_values:
+def create_schema():
+    bson=params_for_sql_query()
+    for table_names, column_dict in bson.items():
+        table_name=table_names
+        column_name= [i for i, j in column_dict.items()]
+        print(f' this is : {table_name},  and this is its columns {column_name}')
 
-#         query="CREATE TABLE table_name (_id INT, name VARCHAR[40]);"
-#         obj.mycursor.execute(query)
-       
+        query=f"CREATE TABLE {table_name} ({column_name});"
+        print(query)
+        obj.mycursor.execute(query)
+    return True
 
 
 
 
     
     
-# table_list= all_table_name()[:3]
-# # table_attribute=table_fill_values()
-# create_schema(table_list)
 
 
 
-# obj.mycursor.execute("DROP TABLE anjala")
+
+
 print(obj.close_connection())
+
 
 
 
