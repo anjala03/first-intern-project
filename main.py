@@ -122,28 +122,38 @@ sql_schema_json = params_for_sql_query()
 #--- for mysql schema----------------------------------------------------------------------------------------------
 
 def column_type(column_name):
-    print(column_name)
+    json = {}
     if ("_id" in column_name or "id" in column_name or "limit" in column_name or "_count" in column_name):
-        return {column_name : "INT"}
+        json[column_name] = "INT"
+        return json
     elif "price"in column_name or "total" in column_name or "amount" in column_name:
-        return {column_name : "FLOAT"}
+        json[column_name] = "FLOAT"
+        return json
     elif "active" in column_name:
-        return {column_name : "BOOL"}
+        json[column_name] = "BOOL"
+        return json
     else:
-        return {column_name : "VARCHAR[100]"}
-
+        json[column_name] = "VARCHAR[100]"
+        return json
 
 
 def create_schema():
     bson=params_for_sql_query()
     for table_names, column_dict in bson.items():
-        table_name=table_names
-        column_names=column_dict.keys()
+        table_name = table_names
+        column_names = column_dict.keys()
+        # column_definition = []
         for each_column in column_names:
             column_Type = column_type(each_column)
-            if column_Type:
-                query=f"CREATE TABLE {table_name} ({each_column} {column_Type[each_column]});"
-                print(query)
+            # column_definition.append(column_Type)
+            # print(column_definition)
+        if column_Type:
+            if table_name:
+                query = f"CREATE TABLE if not exists {table_name} ({f'{each_column} {column_Type[each_column]}'});"
+                # query = f"CREATE TABLE if not exists {table_name} ({','.join(column_definition)});"
+
+
+        print(query)
 
 
          
