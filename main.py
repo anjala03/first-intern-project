@@ -124,21 +124,13 @@ sql_schema_json = params_for_sql_query()
 def column_type(column_name):
     print(column_name)
     if ("_id" in column_name or "id" in column_name or "limit" in column_name or "_count" in column_name):
-        return "INT"
+        return {column_name : "INT"}
     elif "price"in column_name or "total" in column_name or "amount" in column_name:
-        return "FLOAT"
+        return {column_name : "FLOAT"}
     elif "active" in column_name:
-        return "BOOL"
+        return {column_name : "BOOL"}
     else:
-        return "VARCHAR[100]"
-
-
-#function call for the data type determination
-json=params_for_sql_query()
-for table_name, column_dictionary in json.items():
-    column_names=column_dictionary.keys()
-    for each_column in column_names:
-        print(column_type(each_column)) #function calledover here 
+        return {column_name : "VARCHAR[100]"}
 
 
 
@@ -146,12 +138,19 @@ def create_schema():
     bson=params_for_sql_query()
     for table_names, column_dict in bson.items():
         table_name=table_names
-        column_name= [i for i, j in column_dict.items()]
-        print(f' this is : {table_name},  and this is its columns {column_name}')
+        column_names=column_dict.keys()
+        for each_column in column_names:
+            column_Type = column_type(each_column)
+            if column_Type:
+                query=f"CREATE TABLE {table_name} ({each_column} {column_Type[each_column]});"
+                print(query)
 
-        query=f"CREATE TABLE {table_name} ({column_name});"
-        print(query)
-        obj.mycursor.execute(query)
+
+         
+
+        # query=f"CREATE TABLE {table_name} ({column_name});"
+        # print(query)
+        # obj.mycursor.execute(query)
     return True
 
 
@@ -163,7 +162,7 @@ def create_schema():
 
 
 
-
+print(create_schema())
 print(obj.close_connection())
 
 
