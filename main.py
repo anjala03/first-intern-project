@@ -107,11 +107,8 @@ def params_for_sql_query():
         if bson.get(each_table) == {}:
             for each_extended_table in extended_table_attributes:
                 column_list = each_extended_table[0]
-                print("hiiii")
-                print(column_list)
-                print(f' table name is {each_table}')
-                similar_search=difflib.get_close_matches(each_table, column_list)
-                print(similar_search)
+                table_name=each_table.split("_")[0] #done to resolve the case of tier_and_details table, the probability of match is very low when the whole string is compared with column name
+                similar_search=difflib.get_close_matches(table_name, column_list, cutoff=0.6)
                 if similar_search:
                     for each_column in column_list:
                         bson[each_table][each_column] = "None"
