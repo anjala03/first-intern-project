@@ -1,3 +1,4 @@
+
 from pymongo_get_database import MongoDB
 import os
 from dotenv import load_dotenv
@@ -12,7 +13,6 @@ load_dotenv()
 connection_str = os.getenv("Mongo_connection_url")
 obj = MongoDB(connection_str)
 check = obj.connection_check()
-print(check)
 #function call related to mongodb ---
 collections = obj.list_collection()
 # print("-----LIST OF COLLECTION FROM MONGODB-----")
@@ -22,7 +22,7 @@ collections = obj.list_collection()
 collection_docs = obj.collection_docs()
 
 # print("--------LIST OF COLLECTION_CONTENTS FROM MONGODB-------")
-# print(collection_docs)
+print(collection_docs)
 
 
 def all_table_name():    
@@ -114,66 +114,36 @@ def params_for_sql_query():
                         bson[each_table][each_column] = "None"
     return bson
 
-sql_schema_json = params_for_sql_query()
-# print(json.dumps(sql_schema_json))
-
- 
-
-#--- for mysql schema----------------------------------------------------------------------------------------------
-
-def column_type(column_name):
-    json = {}
-    if ("_id" in column_name or "id" in column_name or "limit" in column_name or "_count" in column_name):
-        json[column_name] = "INT"
-        return json
-    elif "price"in column_name or "total" in column_name or "amount" in column_name:
-        json[column_name] = "FLOAT"
-        return json
-    elif "active" in column_name:
-        json[column_name] = "BOOL"
-        return json
-    else:
-        json[column_name] = "VARCHAR[100]"
-        return json
 
 
-def create_schema():
-    bson=params_for_sql_query()
-    for table_names, column_dict in bson.items():
-        table_name = table_names
-        column_names = column_dict.keys()
-        # column_definition = []
+
+
+def create_schema(bson):
+    for table_name, column_dict in bson.items():
+        column_names=column_dict.keys()
+        columns = []
+        CONSTRAINT = ""
         for each_column in column_names:
-            column_Type = column_type(each_column)
-            # column_definition.append(column_Type)
-            # print(column_definition)
-        if column_Type:
-            if table_name:
-                query = f"CREATE TABLE if not exists {table_name} ({f'{each_column} {column_Type[each_column]}'});"
-                # query = f"CREATE TABLE if not exists {table_name} ({','.join(column_definition)});"
-
-
+            columns.append(f"{each_column} {bson.get(table_name).get(each_column)}")
+        query = f"CREATE TABLE IF NOT EXISTS {table_name} ({','.join(columns)});"
         print(query)
-
-
-         
-
-        # query=f"CREATE TABLE {table_name} ({column_name});"
-        # print(query)
-        # obj.mycursor.execute(query)
+        obj.mycursor.execute(query)
     return True
 
+if __name__ == "__main__":
 
+    # --------- Get Schema -------------
+    sql_schema_json = params_for_sql_query()
+    with open("schema_none.json" , "w") as fp:
+        json.dump(sql_schema_json , fp)
 
+    # ---------- CREATE SCHEMA ---------------
+    with open("schema.json" , "r") as fp:
+        schema_refined = json.load(fp)
+    print(create_schema(schema_refined))
 
-    
-    
-
-
-
-
-print(create_schema())
-print(obj.close_connection())
+    # ---------- Close Connecion --------------------
+    print(obj.close_connection())
 
 
 
@@ -198,7 +168,6 @@ print(obj.close_connection())
 
     
     
-
 
 
 
