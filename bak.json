@@ -1,0 +1,50 @@
+{
+    "transactions_extended_table": {
+        "date": "DATE",
+        "amount": "DECIMAL(10,2)",
+        "transaction_code": "VARCHAR(255)",
+        "symbol": "VARCHAR(10)",
+        "price": "DECIMAL(10,2)",
+        "total": "DECIMAL(10,2)",
+        "id": "INT AUTO_INCREMENT PRIMARY KEY"
+  
+      },
+      "tier_and_details": {
+        "tier": "VARCHAR(50)",
+        "benefits":"TEXT",
+        "active": "BOOLEAN",
+        "id": "VARCHAR(50) PRIMARY KEY"
+      },
+      "products": {
+          "id": "INT AUTO_INCREMENT PRIMARY KEY", 
+          "products" : "TEXT"
+      },  
+      "accounts": {
+        "account_id": "INT PRIMARY KEY ",
+        "acc_limit": "DECIMAL(10,2)",
+        "products" : "INT",
+        "FOREIGN KEY":"(products) REFERENCES products(id) ON DELETE CASCADE"
+      },
+    "transactions": {
+      "_id": "INT AUTO_INCREMENT PRIMARY KEY",
+      "account_id": "INT",
+      "transaction_count": "INT",
+      "bucket_start_date": "DATE",
+      "bucket_end_date": "DATE",
+      "transactions" : "INT",
+      "FOREIGN KEY":"(transactions) REFERENCES transactions_extended_table(id) ON DELETE CASCADE"
+    },
+    "customers": {
+      "_id": "INT AUTO_INCREMENT PRIMARY KEY",
+      "username": "VARCHAR(255)",
+      "name": "VARCHAR(255)",
+      "address": "TEXT",
+      "birthdate": "DATE",
+      "email": "VARCHAR(255)",
+      "accounts" : "INT",
+      "tier_and_details": "VARCHAR(50)",
+      "FOREIGN KEY":"(accounts) REFERENCES accounts(account_id) ON DELETE CASCADE,FOREIGN KEY (tier_and_details) REFERENCES tier_and_details(id) ON DELETE CASCADE"
+    }
+
+    
+  }

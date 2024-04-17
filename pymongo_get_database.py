@@ -35,6 +35,22 @@ class MongoDB:
                 collection_docs.append(show_documents(i))
             return collection_docs
 
+    def collection_name_and_docs(self):
+            if self.client != None:
+                self.my_db = self.client.sample_analytics
+                documents = {}
+                def show_documents(collection_name):
+                    all_data = self.my_db[collection_name].find({})
+                    each_row=[]
+                    for i in all_data:
+                        each_row.append(i)
+                        documents[collection_name] = each_row
+                    return documents
+                collection_docs = []
+                for i in self.collections:
+                    collection_docs.append(show_documents(i))
+                return documents
+                
 
         
             

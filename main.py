@@ -20,9 +20,14 @@ collections = obj.list_collection()
 # print()
 
 collection_docs = obj.collection_docs()
+# print(extended_table_values()[0])    
+#-----------------------------------for sql---------------------------------------------------------
+mysql_obj = MySQLclass(host="127.0.0.1", port="3306", user="anjala_bhatta")
+print(f'sql connection {mysql_obj.point_connection()}')
+
 
 # print("--------LIST OF COLLECTION_CONTENTS FROM MONGODB-------")
-print(collection_docs)
+# print(collection_docs)
 
 
 def all_table_name():    
@@ -81,10 +86,6 @@ def table_fill_values():
     return all_table_values #returns a list with three tuple(0,1,2), inside each tuple is a tuple with four attr-pk, alltabledata, colum, rowval
 
 
-# print(extended_table_values()[0])    
-#-----------------------------------for sql---------------------------------------------------------
-obj = MySQLclass(host="127.0.0.1", port="3306", user="anjala_bhatta")
-print(f'sql connection {obj.point_connection()}')
 
 def params_for_sql_query():  
     bson = {}
@@ -116,8 +117,6 @@ def params_for_sql_query():
 
 
 
-
-
 def create_schema(bson):
     for table_name, column_dict in bson.items():
         column_names=column_dict.keys()
@@ -126,24 +125,43 @@ def create_schema(bson):
         for each_column in column_names:
             columns.append(f"{each_column} {bson.get(table_name).get(each_column)}")
         query = f"CREATE TABLE IF NOT EXISTS {table_name} ({','.join(columns)});"
-        print(query)
-        obj.mycursor.execute(query)
+        # print(query)
+        mysql_obj.mycursor.execute(query)
     return True
 
 if __name__ == "__main__":
 
-    # --------- Get Schema -------------
-    sql_schema_json = params_for_sql_query()
-    with open("schema_none.json" , "w") as fp:
-        json.dump(sql_schema_json , fp)
-
     # ---------- CREATE SCHEMA ---------------
-    with open("schema.json" , "r") as fp:
-        schema_refined = json.load(fp)
-    print(create_schema(schema_refined))
+    user_ip = input("enter your file name for json, example schema.json\n >> ")
+    if ".json" in user_ip:
+        with open(user_ip , "r") as fp:
+            schema_refined = json.load(fp)
+            print(create_schema(schema_refined))
+    else:
+        print("no such file")
+
+    # ----------FILL SCHEMA --------------------
+    mongo_table_value = obj.collection_name_and_docs()
+    for collection_name, documents in mongo_table_value.items():
+        print(collection_name)
+        for document in documents:
+            columns= []
+            for column_name, column_value in document.items():
+                print(schema_refined)
+                schema_collection = schema_refined.get(collection_name).get(column_name)
+                print(schema_collection, column_name)
+            #     if column_name ==  each_column:
+            #         if isinstance(column_value, type((datetime, int))):
+            #             column_value = str(column_value)
+            #             columns.append(column_value)
+            #         print(columns)
+            # query = f"INSERT INTO {collection_name} VALUES{(','.join(columns))}"
+            # print(query)
+
+
 
     # ---------- Close Connecion --------------------
-    print(obj.close_connection())
+    print(mysql_obj.close_connection())
 
 
 
