@@ -15,11 +15,9 @@ obj = MongoDB(connection_str)
 check = obj.connection_check()
 #function call related to mongodb ---
 collections = obj.list_collection()
-# print("-----LIST OF COLLECTION FROM MONGODB-----")
-# print(collections)
-# print()
-
 collection_docs = obj.collection_docs()
+mongo_table_value = obj.collection_name_and_docs()
+
 # print(extended_table_values()[0])    
 #-----------------------------------for sql---------------------------------------------------------
 mysql_obj = MySQLclass(host="127.0.0.1", port="3306", user="anjala_bhatta")
@@ -130,6 +128,7 @@ def create_schema(bson):
     return True
 
 
+#function that handles the foreign key relation in schema.json
 def handle_foreign_key(column_name, schema_refined, table_name):
         column_type = schema_refined.get(table_name).get(column_name)
         multiple_foreign_key = column_type.split(",")
@@ -177,12 +176,15 @@ if __name__ == "__main__":
 
 # ---- schema filllll-----------
     
+    def insert_value_in_schema(mongo_table_value, formed_schema):
+        for table_name, values in formed_schema.items():
+            all_column = list(values.keys())
+            for each_column in all_column[::-1]:
+                print(each_column)
+                if each_column == "FOREIGN KEY":
+                     abc= handle_foreign_key(each_column, formed_schema, table_name)
     
-    mongo_table_value = obj.collection_name_and_docs()
-    for table_name, values in schema_refined.items():
-        for column_name, column_type in values.items():
-            if column_name == "FOREIGN KEY":
-                handle_foreign_key(column_name, schema_refined, table_name)
+    print(insert_value_in_schema(mongo_table_value, schema_refined))
              
 
     # ---------- Close Connecion --------------------
