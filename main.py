@@ -129,36 +129,61 @@ def create_schema(bson):
         mysql_obj.mycursor.execute(query)
     return True
 
+
+def handle_foreign_key(column_name, schema_refined, table_name):
+        column_type = schema_refined.get(table_name).get(column_name)
+        multiple_foreign_key = column_type.split(",")
+        foreign_key_list = [multiple_foreign_key[0]]
+        each_foreign = [i.replace("FOREIGN KEY ", "") for i in multiple_foreign_key[1:]]
+        foreign_key_list.extend(each_foreign)
+        empty_list = []
+        for each in foreign_key_list:
+            two_parts = each.replace(" ON DELETE CASCADE", "").split(" REFERENCES ")
+            first_part = two_parts[0].replace("(", "").replace(")", "")
+            second_part_table_name = (two_parts[1].split("(")[0])
+            second_part_column_name = (two_parts[1].split("(")[1]).replace(")", "") 
+            empty_list.append([first_part,[second_part_table_name, second_part_column_name]])
+        return empty_list
+
 if __name__ == "__main__":
 
     # ---------- CREATE SCHEMA ---------------
-    user_ip = input("enter your file name for json, example schema.json\n >> ")
+    user_ip = input("enter your file name for json\n >> ")
+    user_ip = user_ip if '.json' in user_ip else "schema.json"
     if ".json" in user_ip:
         with open(user_ip , "r") as fp:
             schema_refined = json.load(fp)
-            print(create_schema(schema_refined))
+            # print(create_schema(schema_refined))
     else:
         print("no such file")
 
     # ----------FILL SCHEMA --------------------
+    # mongo_table_value = obj.collection_name_and_docs()
+    # for collection_name, documents in mongo_table_value.items():
+    #     print(collection_name)
+    #     for document in documents:
+    #         rows= []
+    #         for column_name, column_value in document.items():
+    #             columns = schema_refined.keys()
+    #             for each_column in columns:
+    #                 if each_column == column_name:
+    #                     # if isinstance (each_column, type(datetime, int)):
+    #                     #     each_column = str(each_column)
+    #                     column_type = schema_refined.get(collection_name).get(column_name, "")
+    #                     rows.append(column_value)
+    #             print(rows)
+    #             query = f"INSERT INTO {collection_name} VALUES ({','.join(rows)});"
+    #         print(query)
+
+# ---- schema filllll-----------
+    
+    
     mongo_table_value = obj.collection_name_and_docs()
-    for collection_name, documents in mongo_table_value.items():
-        print(collection_name)
-        for document in documents:
-            columns= []
-            for column_name, column_value in document.items():
-                print(schema_refined)
-                schema_collection = schema_refined.get(collection_name).get(column_name)
-                print(schema_collection, column_name)
-            #     if column_name ==  each_column:
-            #         if isinstance(column_value, type((datetime, int))):
-            #             column_value = str(column_value)
-            #             columns.append(column_value)
-            #         print(columns)
-            # query = f"INSERT INTO {collection_name} VALUES{(','.join(columns))}"
-            # print(query)
-
-
+    for table_name, values in schema_refined.items():
+        for column_name, column_type in values.items():
+            if column_name == "FOREIGN KEY":
+                handle_foreign_key(column_name, schema_refined, table_name)
+             
 
     # ---------- Close Connecion --------------------
     print(mysql_obj.close_connection())
