@@ -180,12 +180,42 @@ if __name__ == "__main__":
         for table_name, values in formed_schema.items():
             all_column = list(values.keys())
             for each_column in all_column[::-1]:
-                print(each_column)
                 if each_column == "FOREIGN KEY":
-                     abc= handle_foreign_key(each_column, formed_schema, table_name)
-    
+                    foreign_key = handle_foreign_key(each_column, formed_schema, table_name)
+                    for each in foreign_key:
+                        column_name_in_foreign_table = each[0]
+                        table_name_primary_key = each[1]
+                else:
+                    pass
+            # --------------   getting the table_value from mongo --------
+            documents = mongo_table_value.get(table_name)
+            try:
+                for each_document in documents:
+                    all_keys = each_document.keys()
+                    for each_key in all_keys:
+                        print(f'each_key = {each_key}, and each_column = {each_column}')
+                        column_value = []
+                        column_list = []
+                        if each_key == "_id":
+                            print("primary key")
+                            continue
+                        elif each_key == each_column:
+                            column_list.append(each_column)
+                            value = each_document.get(each_key)
+                            if not isinstance(value, type(str)):
+                                value = str(value)
+                            column_value.append(value)
+                            print(f'{column_value}, the column name is {column_list}')
+                        else:
+                            print("column name didnot match ")
+                        query = f"INSERT INTO {table_name} ({",".join(column_list)}) VALUES({",".join(column_value)});"
+                        print(query)
+
+            except Exception as err:
+                print(err)
+        
     print(insert_value_in_schema(mongo_table_value, schema_refined))
-             
+            
 
     # ---------- Close Connecion --------------------
     print(mysql_obj.close_connection())
