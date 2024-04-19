@@ -130,19 +130,23 @@ def create_schema(bson):
 
 #function that handles the foreign key relation in schema.json
 def handle_foreign_key(column_name, schema_refined, table_name):
-        column_type = schema_refined.get(table_name).get(column_name)
-        multiple_foreign_key = column_type.split(",")
-        foreign_key_list = [multiple_foreign_key[0]]
-        each_foreign = [i.replace("FOREIGN KEY ", "") for i in multiple_foreign_key[1:]]
-        foreign_key_list.extend(each_foreign)
-        empty_list = []
-        for each in foreign_key_list:
-            two_parts = each.replace(" ON DELETE CASCADE", "").split(" REFERENCES ")
-            first_part = two_parts[0].replace("(", "").replace(")", "")
-            second_part_table_name = (two_parts[1].split("(")[0])
-            second_part_column_name = (two_parts[1].split("(")[1]).replace(")", "") 
-            empty_list.append([first_part,[second_part_table_name, second_part_column_name]])
-        return empty_list
+        if column_name == "FOREIGN KEY":
+            column_type = schema_refined.get(table_name).get(column_name)
+            multiple_foreign_key = column_type.split(",")
+            foreign_key_list = [multiple_foreign_key[0]]
+            each_foreign = [i.replace("FOREIGN KEY ", "") for i in multiple_foreign_key[1:]]
+            foreign_key_list.extend(each_foreign)
+            empty_list = []
+            for each in foreign_key_list:
+                two_parts = each.replace(" ON DELETE CASCADE", "").split(" REFERENCES ")
+                first_part = two_parts[0].replace("(", "").replace(")", "")
+                print('first',two_parts)
+                second_part_table_name = (two_parts[1].split("(")[0])
+                print('secomd',empty_list)
+                second_part_column_name = (two_parts[1].split("(")[1]).replace(")", "") 
+                empty_list.append([first_part,[second_part_table_name, second_part_column_name]])
+            return empty_list
+        return "Not a foreign key"
 
 if __name__ == "__main__":
 
@@ -182,6 +186,7 @@ if __name__ == "__main__":
             for each_column in all_column[::-1]:
                 if each_column == "FOREIGN KEY":
                     foreign_key = handle_foreign_key(each_column, formed_schema, table_name)
+                    print(foreign_key)
                     for each in foreign_key:
                         column_name_in_foreign_table = each[0]
                         table_name_primary_key = each[1]
@@ -192,14 +197,26 @@ if __name__ == "__main__":
                 try:
                     for each_document in documents:
                         all_keys = each_document.keys()
+                        column_value = []
+                        column_list = []
                         for each_key in all_keys:
                             print(f'each_key = {each_key}, and each_column = {each_column}')
-                            column_value = []
-                            column_list = []
                             if each_key == "_id":
                                 print("primary key")
                                 continue
                             elif each_key == each_column:
+                                try:
+                                    print("hiii anup")
+                                    foreign_key = handle_foreign_key(each_column, formed_schema, table_name)
+                                    print('abc')
+                                    print(foreign_key)
+                                    for each in foreign_key:
+                                        column_name_in_foreign_table = each[0]
+                                        table_name_primary_key = each[1]
+                                    if each_column == column_name_in_foreign_table:
+                                        continue
+                                except Exception as e:
+                                    print(e)
                                 column_list.append(each_column)
                                 value = each_document.get(each_key)
                                 if not isinstance(value, type(str)):
@@ -208,8 +225,8 @@ if __name__ == "__main__":
                                 print(f'{column_value}, the column name is {column_list}')
                             else:
                                 print("column name didnot match ")
-                            query = f"INSERT INTO {table_name} ({",".join(column_list)}) VALUES({",".join(column_value)});"
-                            print(query)
+                    query = f"INSERT INTO {table_name} ({",".join(column_list)}) VALUES({",".join(column_value)});"
+                    print(query)
 
                 except Exception as err:
                     print(err)
