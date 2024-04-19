@@ -188,31 +188,31 @@ if __name__ == "__main__":
                 else:
                     pass
             # --------------   getting the table_value from mongo --------
-            documents = mongo_table_value.get(table_name)
-            try:
-                for each_document in documents:
-                    all_keys = each_document.keys()
-                    for each_key in all_keys:
-                        print(f'each_key = {each_key}, and each_column = {each_column}')
-                        column_value = []
-                        column_list = []
-                        if each_key == "_id":
-                            print("primary key")
-                            continue
-                        elif each_key == each_column:
-                            column_list.append(each_column)
-                            value = each_document.get(each_key)
-                            if not isinstance(value, type(str)):
-                                value = str(value)
-                            column_value.append(value)
-                            print(f'{column_value}, the column name is {column_list}')
-                        else:
-                            print("column name didnot match ")
-                        query = f"INSERT INTO {table_name} ({",".join(column_list)}) VALUES({",".join(column_value)});"
-                        print(query)
+                documents = mongo_table_value.get(table_name)
+                try:
+                    for each_document in documents:
+                        all_keys = each_document.keys()
+                        for each_key in all_keys:
+                            print(f'each_key = {each_key}, and each_column = {each_column}')
+                            column_value = []
+                            column_list = []
+                            if each_key == "_id":
+                                print("primary key")
+                                continue
+                            elif each_key == each_column:
+                                column_list.append(each_column)
+                                value = each_document.get(each_key)
+                                if not isinstance(value, type(str)):
+                                    value = str(value)
+                                column_value.append(value)
+                                print(f'{column_value}, the column name is {column_list}')
+                            else:
+                                print("column name didnot match ")
+                            query = f"INSERT INTO {table_name} ({",".join(column_list)}) VALUES({",".join(column_value)});"
+                            print(query)
 
-            except Exception as err:
-                print(err)
+                except Exception as err:
+                    print(err)
         
     print(insert_value_in_schema(mongo_table_value, schema_refined))
             
