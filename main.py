@@ -170,12 +170,10 @@ if __name__ == "__main__":
             for each_column in all_column[::-1]:
                 if each_column == "FOREIGN KEY":
                     foreign_key = handle_foreign_key(each_column, formed_schema, table_name)
-                    status = foreign_key[0]
-                    try:
-                        for column_table_col_list in foreign_key[1]:
-                           pass
-                    except Exception as e:
-                        print(e)
+                    print(f'this is the foreign keys {foreign_key}')
+                    for each_column_table_list in foreign_key[1]:
+                        foreign_table_fill = {}
+                        status = foreign_key[0]
                 else:
                     pass
             # --------------   getting the table_value from mongo --------
@@ -191,8 +189,27 @@ if __name__ == "__main__":
                                 continue
 
                             elif each_key == each_column:
-                                if each_column in column_table_col_list[0]:
+                                if each_column in each_column_table_list[0]:
                                     print('its a foreign key or column ')
+                                    extend_table_name_and_column = each_column_table_list[1]
+                                    ext_table_name = extend_table_name_and_column[0]
+                                    ext_column_name = extend_table_name_and_column[1]
+                                    foreign_table_values = each_document.get(each_key)
+                                    if isinstance(foreign_table_values, type(list)):
+                                        print("foreignkeyyyyyy")
+                                        for each_record in foreign_table_values:
+                                            try:
+                                                if type(each_record) is dict:
+
+                                                    pass
+                                            except Exception as e:
+                                                print(e)
+                                            else:
+                                                print('foreignhandle')
+                                                # query = f"INSERT INTO {ext_table_name} (products) VALUES(i for i in {foreign_table_values})"
+                                                # print(f'query for foreign table {query}')
+                                    elif isinstance(foreign_table_values, type(dict)):
+                                        pass
                                 else:
                                     column_value = each_document.get(each_key)
                                     if not isinstance(column_value, type(str)):
@@ -204,7 +221,6 @@ if __name__ == "__main__":
                                 print("column name didnot match ")
                 except Exception as err:
                     print(err)
-            print(f'{table_dict} this is a table dictionary')
             query = f"INSERT INTO {table_name} ({",".join(key for key in table_dict.keys())}) VALUES({",".join(value for value in table_dict.values())});" 
             print(query)   
             
