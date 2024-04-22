@@ -145,8 +145,8 @@ def handle_foreign_key(column_name, schema_refined, table_name):
                 print('secomd',empty_list)
                 second_part_column_name = (two_parts[1].split("(")[1]).replace(")", "") 
                 empty_list.append([first_part,[second_part_table_name, second_part_column_name]])
-            return empty_list
-        return "Not a foreign key"
+            return (True, empty_list)
+        return (False, "Not a foreign key")
 
 if __name__ == "__main__":
 
@@ -160,76 +160,54 @@ if __name__ == "__main__":
     else:
         print("no such file")
 
-    # ----------FILL SCHEMA --------------------
-    # mongo_table_value = obj.collection_name_and_docs()
-    # for collection_name, documents in mongo_table_value.items():
-    #     print(collection_name)
-    #     for document in documents:
-    #         rows= []
-    #         for column_name, column_value in document.items():
-    #             columns = schema_refined.keys()
-    #             for each_column in columns:
-    #                 if each_column == column_name:
-    #                     # if isinstance (each_column, type(datetime, int)):
-    #                     #     each_column = str(each_column)
-    #                     column_type = schema_refined.get(collection_name).get(column_name, "")
-    #                     rows.append(column_value)
-    #             print(rows)
-    #             query = f"INSERT INTO {collection_name} VALUES ({','.join(rows)});"
-    #         print(query)
 
 # ---- schema filllll-----------
     
     def insert_value_in_schema(mongo_table_value, formed_schema):
         for table_name, values in formed_schema.items():
+            table_dict = {}
             all_column = list(values.keys())
             for each_column in all_column[::-1]:
                 if each_column == "FOREIGN KEY":
                     foreign_key = handle_foreign_key(each_column, formed_schema, table_name)
-                    print(foreign_key)
-                    for each in foreign_key:
-                        column_name_in_foreign_table = each[0]
-                        table_name_primary_key = each[1]
+                    status = foreign_key[0]
+                    try:
+                        for column_table_col_list in foreign_key[1]:
+                           pass
+                    except Exception as e:
+                        print(e)
                 else:
                     pass
             # --------------   getting the table_value from mongo --------
                 documents = mongo_table_value.get(table_name)
                 try:
+                    
                     for each_document in documents:
                         all_keys = each_document.keys()
-                        column_value = []
-                        column_list = []
                         for each_key in all_keys:
                             print(f'each_key = {each_key}, and each_column = {each_column}')
                             if each_key == "_id":
                                 print("primary key")
                                 continue
+
                             elif each_key == each_column:
-                                try:
-                                    print("hiii anup")
-                                    foreign_key = handle_foreign_key(each_column, formed_schema, table_name)
-                                    print('abc')
-                                    print(foreign_key)
-                                    for each in foreign_key:
-                                        column_name_in_foreign_table = each[0]
-                                        table_name_primary_key = each[1]
-                                    if each_column == column_name_in_foreign_table:
-                                        continue
-                                except Exception as e:
-                                    print(e)
-                                column_list.append(each_column)
-                                value = each_document.get(each_key)
-                                if not isinstance(value, type(str)):
-                                    value = str(value)
-                                column_value.append(value)
-                                print(f'{column_value}, the column name is {column_list}')
+                                if each_column in column_table_col_list[0]:
+                                    print('its a foreign key or column ')
+                                else:
+                                    column_value = each_document.get(each_key)
+                                    if not isinstance(column_value, type(str)):
+                                        column_value = str(column_value)
+                                    table_dict[each_column] = column_value
+                                   
+                                    print(f' the key value name is {table_dict} ')
                             else:
                                 print("column name didnot match ")
-                    query = f"INSERT INTO {table_name} ({",".join(column_list)}) VALUES({",".join(column_value)});"
-                    print(query)
-
                 except Exception as err:
                     print(err)
+            print(f'{table_dict} this is a table dictionary')
+            query = f"INSERT INTO {table_name} ({",".join(key for key in table_dict.keys())}) VALUES({",".join(value for value in table_dict.values())});" 
+            print(query)   
+            
         
     print(insert_value_in_schema(mongo_table_value, schema_refined))
             
