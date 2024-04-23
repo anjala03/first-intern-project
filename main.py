@@ -107,7 +107,7 @@ def params_for_sql_query():
                         bson[each_table][each_column] = "None"
     return bson
 
-
+# ----- this function is to create schema, function called on create_schem.py --------
 def create_schema(bson):
     for table_name, column_dict in bson.items():
         column_names = column_dict.keys()

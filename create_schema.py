@@ -11,6 +11,5 @@ def create_schema_bson_generator():
     else:
         return "no such file"
 
-
 if __name__ == "__main__":
     print(__name__)
