@@ -8,7 +8,7 @@ import json
 import difflib
 
 
-#for mongodb connection--------
+# -------------------------------for mongodb connection-----------------------------------
 load_dotenv()
 connection_str = os.getenv("Mongo_connection_url")
 obj = MongoDB(connection_str)
@@ -18,16 +18,12 @@ collections = obj.list_collection()
 collection_docs = obj.collection_docs()
 mongo_table_value = obj.collection_name_and_docs()
 
-# print(extended_table_values()[0])    
 #-----------------------------------for sql---------------------------------------------------------
 mysql_obj = MySQLclass(host="127.0.0.1", port="3306", user="anjala_bhatta")
 print(f'sql connection {mysql_obj.point_connection()}')
 
 
-# print("--------LIST OF COLLECTION_CONTENTS FROM MONGODB-------")
-# print(collection_docs)
-
-
+# -------------------------------for mongo data manipulation --------------------------------
 def all_table_name():    
     table_name_lists = []#gives the lists of table names
     for each_collection in collections:
@@ -70,7 +66,6 @@ def extended_table_values():
     return table_values #returns a list with two tuples inside, and each tuple has three attri, first is keys, values and primary key.
 
 
-
 def table_fill_values():
     all_table_values = []
     for documents in collection_docs:
@@ -82,7 +77,6 @@ def table_fill_values():
                     primary_key = field_name #gives the primary key of each table
             all_table_values.append((primary_key, records, table_fields, table_row))      
     return all_table_values #returns a list with three tuple(0,1,2), inside each tuple is a tuple with four attr-pk, alltabledata, colum, rowval
-
 
 
 def params_for_sql_query():  
@@ -114,121 +108,22 @@ def params_for_sql_query():
     return bson
 
 
-
 def create_schema(bson):
     for table_name, column_dict in bson.items():
-        column_names=column_dict.keys()
+        column_names = column_dict.keys()
         columns = []
         CONSTRAINT = ""
         for each_column in column_names:
             columns.append(f"{each_column} {bson.get(table_name).get(each_column)}")
         query = f"CREATE TABLE IF NOT EXISTS {table_name} ({','.join(columns)});"
-        # print(query)
         mysql_obj.mycursor.execute(query)
     return True
 
 
-#function that handles the foreign key relation in schema.json
-def handle_foreign_key(column_name, schema_refined, table_name):
-        if column_name == "FOREIGN KEY":
-            column_type = schema_refined.get(table_name).get(column_name)
-            multiple_foreign_key = column_type.split(",")
-            foreign_key_list = [multiple_foreign_key[0]]
-            each_foreign = [i.replace("FOREIGN KEY ", "") for i in multiple_foreign_key[1:]]
-            foreign_key_list.extend(each_foreign)
-            empty_list = []
-            for each in foreign_key_list:
-                two_parts = each.replace(" ON DELETE CASCADE", "").split(" REFERENCES ")
-                first_part = two_parts[0].replace("(", "").replace(")", "")
-                print('first',two_parts)
-                second_part_table_name = (two_parts[1].split("(")[0])
-                print('secomd',empty_list)
-                second_part_column_name = (two_parts[1].split("(")[1]).replace(")", "") 
-                empty_list.append([first_part,[second_part_table_name, second_part_column_name]])
-            return (True, empty_list)
-        return (False, "Not a foreign key")
-
 if __name__ == "__main__":
 
-    # ---------- CREATE SCHEMA ---------------
-    user_ip = input("enter your file name for json\n >> ")
-    user_ip = user_ip if '.json' in user_ip else "schema.json"
-    if ".json" in user_ip:
-        with open(user_ip , "r") as fp:
-            schema_refined = json.load(fp)
-            # print(create_schema(schema_refined))
-    else:
-        print("no such file")
+    # ---------- mysql Close Connecion --------------------
 
-
-# ---- schema filllll-----------
-    
-    def insert_value_in_schema(mongo_table_value, formed_schema):
-        for table_name, values in formed_schema.items():
-            table_dict = {}
-            all_column = list(values.keys())
-            for each_column in all_column[::-1]:
-                if each_column == "FOREIGN KEY":
-                    foreign_key = handle_foreign_key(each_column, formed_schema, table_name)
-                    print(f'this is the foreign keys {foreign_key}')
-                    for each_column_table_list in foreign_key[1]:
-                        foreign_table_fill = {}
-                        status = foreign_key[0]
-                else:
-                    pass
-            # --------------   getting the table_value from mongo --------
-                documents = mongo_table_value.get(table_name)
-                try:
-                    
-                    for each_document in documents:
-                        all_keys = each_document.keys()
-                        for each_key in all_keys:
-                            print(f'each_key = {each_key}, and each_column = {each_column}')
-                            if each_key == "_id":
-                                print("primary key")
-                                continue
-
-                            elif each_key == each_column:
-                                if each_column in each_column_table_list[0]:
-                                    print('its a foreign key or column ')
-                                    extend_table_name_and_column = each_column_table_list[1]
-                                    ext_table_name = extend_table_name_and_column[0]
-                                    ext_column_name = extend_table_name_and_column[1]
-                                    foreign_table_values = each_document.get(each_key)
-                                    if isinstance(foreign_table_values, type(list)):
-                                        print("foreignkeyyyyyy")
-                                        for each_record in foreign_table_values:
-                                            try:
-                                                if type(each_record) is dict:
-
-                                                    pass
-                                            except Exception as e:
-                                                print(e)
-                                            else:
-                                                print('foreignhandle')
-                                                # query = f"INSERT INTO {ext_table_name} (products) VALUES(i for i in {foreign_table_values})"
-                                                # print(f'query for foreign table {query}')
-                                    elif isinstance(foreign_table_values, type(dict)):
-                                        pass
-                                else:
-                                    column_value = each_document.get(each_key)
-                                    if not isinstance(column_value, type(str)):
-                                        column_value = str(column_value)
-                                    table_dict[each_column] = column_value
-                                   
-                                    print(f' the key value name is {table_dict} ')
-                            else:
-                                print("column name didnot match ")
-                except Exception as err:
-                    print(err)
-            query = f"INSERT INTO {table_name} ({",".join(key for key in table_dict.keys())}) VALUES({",".join(value for value in table_dict.values())});" 
-            print(query)   
-            
-        
-    print(insert_value_in_schema(mongo_table_value, schema_refined))
-            
-
-    # ---------- Close Connecion --------------------
     print(mysql_obj.close_connection())
 
 

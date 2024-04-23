@@ -41,7 +41,7 @@ class MongoDB:
                 documents = {}
                 def show_documents(collection_name):
                     all_data = self.my_db[collection_name].find({})
-                    each_row=[]
+                    each_row = []
                     for i in all_data:
                         each_row.append(i)
                         documents[collection_name] = each_row
