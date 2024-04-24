@@ -48,22 +48,35 @@ def insert_value_in_schema(mongo_table_value, formed_schema):
                                         foreign_table_name_and_pk = each_column_table_list[1]
                                         foreign_table_name = foreign_table_name_and_pk[0]
                                         foreign_table_primary_key = foreign_table_name_and_pk[1]
-                                        # only fill the foreign table if the foreign key dont have a table 
+                                        # Only fill the foreign table if the foreign key dont have a table 
                                         if not foreign_table_name in (key for key in mongo_table_value.keys()):
                                             fill_foreign_table = {}
                                             foreign_columns = formed_schema.get(foreign_table_name)
-                                            for each_foreign_column in foreign_columns: 
-                                                print(f'foreign_columns = {each_foreign_column}')
-                                                foreign_table_values = each_document.get(each_key)
-                                            # foreign_table_values = each_document.get(each_key)
-                                                print('foreign_table_values', foreign_table_values)
-                                            fill_foreign_table[foreign_columns] = foreign_table_values
+                                            for each_foreign_column in foreign_columns:
+                                                # Exception case for tier and details as there is no auto increment for it
+                                                print(f'here foreign table {foreign_table_name}')
+                                                if each_foreign_column == "id" and foreign_table_name != "tier_and_details" :
+                                                      # Continue is there to simply skip the auto increment primary key case
+                                                     continue
+                                                else:
+                                                    foreign_table_values = each_document.get(each_key)
+                                                    for each_value in foreign_table_values:
+                                                        if type(each_value) is dict:
+                                                              for each_key in each_value.keys():
+                                                                  print("hiiiiiieach_value", each_value)
+                                                                  if each_key == each_foreign_column:
+                                                                    print(f' errrorrrrrr {each_value[each_foreign_column]}')
+                                                                    fill_foreign_table[each_foreign_column] = each_value[each_foreign_column]
+                                                        
+                                                        else:
+                                                            print(f'else block {fill_foreign_table[each_foreign_column]}: {each_value} ')
+                                                            fill_foreign_table[each_foreign_column] = each_value
                                             print("fill_foreign_table", fill_foreign_table)
+                                                                
 
-                                        if isinstance(foreign_table_values, type(list)):
+                                        else:
                                             pass
-                                        for each_record in foreign_table_values:
-                                            pass
+                                                            
                             except Exception as e:
                                 print(e)
                         elif each_column == "_id":
