@@ -24,7 +24,11 @@ def handle_foreign_key(column_name, schema_refined, table_name):
         return (False, "Not a foreign key")
             
 
-        
+def bidirectional_generator(items):
+    for i in items:
+        yield i
+
+
 def insert_value_in_schema(mongo_table_value, formed_schema):
     # --- FROM formed schmea -------------
     for table_name, values in formed_schema.items():
@@ -52,43 +56,56 @@ def insert_value_in_schema(mongo_table_value, formed_schema):
                                         if not foreign_table_name in (key for key in mongo_table_value.keys()):
                                             fill_foreign_table = {}
                                             foreign_columns = formed_schema.get(foreign_table_name)
-                                            for each_foreign_column in foreign_columns:
+                                            print("foreign_columns", foreign_columns)
+                                            try:
+                                                each_foreign_column_generator = bidirectional_generator(foreign_columns)
+                                                each_foreign_column = next(each_foreign_column_generator)
                                                 # Exception case for tier and details as there is no auto increment for it
-                                                print(f'here foreign table {foreign_table_name}')
                                                 if each_foreign_column == "id" and foreign_table_name != "tier_and_details" :
                                                       # Continue is there to simply skip the auto increment primary key case
                                                      continue
                                                 else:
-                                                    foreign_table_values = each_document.get(each_key)
-                                                    for each_value in foreign_table_values:
-                                                        if type(each_value) is dict:
-                                                              for each_key in each_value.keys():
-                                                                  print("hiiiiiieach_value", each_value)
-                                                                  if each_key == each_foreign_column:
-                                                                    print(f' errrorrrrrr {each_value[each_foreign_column]}')
-                                                                    fill_foreign_table[each_foreign_column] = each_value[each_foreign_column]
+                                                    foreign_table_values = each_document.get(each_key,{})
+                                                    print("foreign_table_values 0", foreign_table_values, each_key , "doc rj", each_document)
+                                                    each_foreign_column_generator = bidirectional_generator(foreign_columns)
+                                                    for each_value in foreign_table_values: 
+                                                        print("foreign_table_values", foreign_table_values, "foreign_table_name=", foreign_table_name)
+                                                        # print("each_value", each_value)
                                                         
-                                                        else:
-                                                            print(f'else block {fill_foreign_table[each_foreign_column]}: {each_value} ')
-                                                            fill_foreign_table[each_foreign_column] = each_value
-                                            print("fill_foreign_table", fill_foreign_table)
+                                                        each_foreign_column = next(each_foreign_column_generator)
+                                                        if (type(each_value) is str):
+                                                            if type(foreign_table_values) is list:
+                                                                fill_foreign_table[each_foreign_column] = each_value
+                                                                print('I AM LIST')
+                                                            else:
+                                                                for key, value in foreign_table_values[each_value].items():
+                                                                    if not type(value) is str:
+                                                                        value = str(value)
+                                                                    fill_foreign_table[key] = value
+                                                                    # print( "elif block foreign fill",fill_foreign_table)
+                                                        elif type(each_value) is dict:
+                                                            for each_key in each_value.keys():
+                                                                print(f' this is each key {each_key},  and this is {each_foreign_column}')
+                                                                if each_key == each_foreign_column:
+                                                                    fill_foreign_table[each_foreign_column] = str(each_value[each_foreign_column])
+                                                print("the final foreign table", fill_foreign_table)
+                                                                        # print("else block foreign fill",fill_foreign_table)
+                                            except Exception as err:
+                                                print(err)          
                                                                 
-
-                                        else:
-                                            pass
                                                             
                             except Exception as e:
                                 print(e)
                         elif each_column == "_id":
-                            print("is a primary key", each_column)
+                            # print("is a primary key", each_column)
                             continue
                         else:
-                            print('each-column', each_column)
+                            # print('each-column', each_column)
                             column_value = each_document.get(each_key)
                             if not isinstance(column_value, type(str)):
                                 column_value = str(column_value)
                             table_dict[each_column] = column_value
-                    query = f"INSERT INTO {table_name} ({",".join(key for key in table_dict.keys())}) VALUES({",".join(value for value in table_dict.values())});" 
+                    query = f"INSERT INTO {table_name} ({','.join(key for key in table_dict.keys())}) VALUES({','.join(value for value in table_dict.values())});" 
                     # print(query)
             except Exception as e:
                     print(e)
