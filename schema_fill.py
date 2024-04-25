@@ -60,20 +60,23 @@ def insert_value_in_schema(mongo_table_value, formed_schema):
                                             try:
                                                 each_foreign_column_generator = bidirectional_generator(foreign_columns)
                                                 each_foreign_column = next(each_foreign_column_generator)
+                                                print("each_foreign_column_from_generator",each_foreign_column,each_foreign_column_generator)
                                                 # Exception case for tier and details as there is no auto increment for it
-                                                if each_foreign_column == "id" and foreign_table_name != "tier_and_details" :
+                                                if each_foreign_column == "id" and foreign_table_name != "tier_and_details":
+                                                    print("each_document_from_top", each_document, each_foreign_column, foreign_table_name) 
                                                       # Continue is there to simply skip the auto increment primary key case
-                                                     continue
+                                                    continue
                                                 else:
                                                     foreign_table_values = each_document.get(each_key,{})
-                                                    print("foreign_table_values 0", foreign_table_values, each_key , "doc rj", each_document)
+                                                    print("foreign_table_values 0", foreign_table_values, each_key , each_document)
                                                     each_foreign_column_generator = bidirectional_generator(foreign_columns)
                                                     for each_value in foreign_table_values: 
                                                         print("foreign_table_values", foreign_table_values, "foreign_table_name=", foreign_table_name)
-                                                        # print("each_value", each_value)
+                                                        print("iach_value", each_value)
                                                         
                                                         each_foreign_column = next(each_foreign_column_generator)
                                                         if (type(each_value) is str):
+                                                            print("anjala", each_foreign_column, each_value )
                                                             if type(foreign_table_values) is list:
                                                                 fill_foreign_table[each_foreign_column] = each_value
                                                                 print('I AM LIST')
@@ -113,4 +116,7 @@ def insert_value_in_schema(mongo_table_value, formed_schema):
 
 if __name__ == "__main__":
     # ---------populate schema ------------------
-    insert_value_in_schema(mongo_table_value, schema_refined)
+    # insert_value_in_schema(mongo_table_value, schema_refined)
+    
+    with open("mongo_value.json", 'w') as fp:
+        fp.write(str(mongo_table_value))

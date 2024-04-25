@@ -19,7 +19,10 @@ collection_docs = obj.collection_docs()
 mongo_table_value = obj.collection_name_and_docs()
 
 #-----------------------------------for sql---------------------------------------------------------
-mysql_obj = MySQLclass(host="127.0.0.1", port="3306", user="anjala_bhatta")
+host = os.getenv("host")
+port = os.getenv("port")
+user = os.getenv("user")
+mysql_obj = MySQLclass(host=host, port=port, user=user)
 print(f'sql connection {mysql_obj.point_connection()}')
 
 
