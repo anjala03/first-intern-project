@@ -112,11 +112,13 @@ def insert_value_in_schema(mongo_table_value, formed_schema):
                     # print(query)
             except Exception as e:
                     print(e)
-                                 
+
+def get_mongo_data_dict():
+    return mongo_table_value
 
 if __name__ == "__main__":
     # ---------populate schema ------------------
     # insert_value_in_schema(mongo_table_value, schema_refined)
     
-    with open("mongo_value.json", 'w') as fp:
+    with open("mongo_value.json", 'w', encoding="utf-8") as fp:
         fp.write(str(mongo_table_value))

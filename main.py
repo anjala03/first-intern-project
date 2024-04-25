@@ -33,6 +33,7 @@ def all_table_name():
         table_name_lists.append(each_collection)
     table = table_fill_values()
     for each_list in table:
+        # print(each_list)
         for key,value in each_list[1].items():
             splitted_table_name = []
             if isinstance(value,(list, dict)):
@@ -115,7 +116,6 @@ def create_schema(bson):
     for table_name, column_dict in bson.items():
         column_names = column_dict.keys()
         columns = []
-        CONSTRAINT = ""
         for each_column in column_names:
             columns.append(f"{each_column} {bson.get(table_name).get(each_column)}")
         query = f"CREATE TABLE IF NOT EXISTS {table_name} ({','.join(columns)});"

@@ -10,7 +10,7 @@ class MySQLclass:
         )
         
     def point_connection(self):
-        if (mycursor := self.my_db.cursor(buffered = True)):
+        if (mycursor := self.my_db.cursor()):
             self.mycursor = mycursor
             return True
         return False

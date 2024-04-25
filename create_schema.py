@@ -12,4 +12,8 @@ def create_schema_bson_generator():
         return "no such file"
 
 if __name__ == "__main__":
-    print(__name__)
+    print()
+    schema_refined = create_schema_bson_generator()
+    print(schema_refined)
+    #schema.json is created manually using schema_none.json
+    
